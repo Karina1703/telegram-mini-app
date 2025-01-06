@@ -1,29 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { mockData } from "../../../public/mockdata";
 import Loader from "@/components/Loader";
 
 type UserData = {
-  nickname: string; // Никнейм пользователя
-  fullName: string; // Полное имя
-  age: number; // Возраст
-  location: string; // Локация
-  bio: string; // Биография
-  lastSeen: string; // Последний визит
+  nickname: string;
+  fullName: string;
+  age: number;
+  location: string;
+  bio: string;
+  lastSeen: string;
   socials: {
-    telegram: string; // Telegram-ссылка
-    instagram: string; // Instagram-ссылка
+    telegram: string;
+    instagram: string;
   };
-  interests: string[]; // Список интересов
-  error?: any; // Возможная ошибка, необязательное поле
+  interests: string[];
+  error?: any;
 };
 
-export default function SearchResults() {
-  const searchParams = useSearchParams();
-  const nickname = searchParams.get("nickname") ?? "";
-  const [userData, setUserData] = useState<UserData | null>(null); // null для начального значения
+function SearchResultsContent({ nickname }: { nickname: string }) {
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const { push } = useRouter();
 
@@ -128,4 +126,25 @@ export default function SearchResults() {
       </main>
     </div>
   );
+}
+
+export default function SearchResults() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader />
+        </div>
+      }
+    >
+      <SearchResultsWithParams />
+    </Suspense>
+  );
+}
+
+function SearchResultsWithParams() {
+  const searchParams = useSearchParams();
+  const nickname = searchParams.get("nickname") ?? "";
+
+  return <SearchResultsContent nickname={nickname} />;
 }
