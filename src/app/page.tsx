@@ -75,6 +75,18 @@ export default function Home() {
     }
   };
 
+  const handleClick = (e: React.MouseEvent<HTMLInputElement>) => {
+    if (inputRef.current) {
+      const cursorPosition = inputRef.current.selectionStart || 0;
+      if (cursorPosition <= 1) {
+        // Перемещаем курсор за @
+        setTimeout(() => {
+          inputRef.current?.setSelectionRange(1, 1);
+        }, 0);
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen p-4 pb-20 pt-[80px]">
       <main className="flex flex-col row-start-2 items-center text-center">
@@ -92,6 +104,7 @@ export default function Home() {
             onFocus={handleFocus}
             onBlur={handleBlur}
             onChange={handleInputChange}
+            onClick={handleClick}
             className="search-input"
             placeholder={"Введите ник, например, @kate_tg"}
           />
