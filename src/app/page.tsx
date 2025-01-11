@@ -1,18 +1,44 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { mockData } from "../../public/mockdata";
+import ReactMarkdown from "react-markdown";
+
+
+type UserData = {
+  nickname: string;
+  description: string;
+};
 
 export default function Home() {
-  const { push } = useRouter();
   const [nickname, setNickname] = useState("");
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [loading, setLoading] = useState(false);
+  const resultsRef = useRef<HTMLDivElement | null>(null);
 
   const handleSearchClick = () => {
     if (nickname.trim()) {
-      push(`/search-results?nickname=${encodeURIComponent(nickname)}`);
+      setLoading(true);
+      setUserData(null); // Очистить предыдущие результаты
+      setTimeout(() => {
+        // Симуляция получения данных
+        setUserData({
+          nickname,
+          description: mockData.description,
+        });
+        setLoading(false);
+      }, 2000); // Имитируем задержку получения данных
     }
   };
-  
+
+  useEffect(() => {
+    if (!loading && userData && resultsRef.current) {
+      const topOffset =
+        resultsRef.current.getBoundingClientRect().top + window.scrollY - 20;
+      window.scrollTo({ top: topOffset, behavior: "smooth" });
+    }
+  }, [loading, userData]);
+
   const handleInputChange = (e: any) => {
     let inputValue = e.target.value;
     inputValue = "@" + inputValue.replace(/@+/g, "").trim();
@@ -54,11 +80,31 @@ export default function Home() {
             type="button"
             className="search-button mt-3"
             onClick={handleSearchClick}
+            disabled={loading || !nickname.trim()}
           >
-            Поиск!
+            {loading ? "Поиск..." : "Поиск!"}
           </button>
         </div>
       </main>
+      {userData && (
+        <div
+          ref={resultsRef}
+          className="min-h-screen p-4 pb-20 pt-[40px] bg-gray-100 mt-8 rounded"
+        >
+          <h1
+            className="font-semibold text-3xl mb-9 tracking-[-2px] max-w-full text-black text-center"
+            style={{
+              whiteSpace: "initial",
+              wordWrap: "break-word",
+            }}
+          >
+            Результаты для {userData.nickname}
+          </h1>
+          <div className="text-left text-black">
+          <ReactMarkdown>{userData.description}</ReactMarkdown>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
