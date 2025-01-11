@@ -74,3 +74,8 @@ body {
   outline: none !important;
   border:1px solid rgb(10, 81, 204);
 }
+
+:root {
+  touch-action: pan-x pan-y;
+  height: 100% 
+}
