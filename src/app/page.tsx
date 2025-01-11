@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { mockData } from "../../public/mockdata";
 import ReactMarkdown from "react-markdown";
 
-
 type UserData = {
   nickname: string;
   description: string;
@@ -15,9 +14,10 @@ export default function Home() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(false);
   const resultsRef = useRef<HTMLDivElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const handleSearchClick = () => {
-    if (nickname.trim()) {
+    if (nickname.trim() && nickname.length > 1) {
       setLoading(true);
       setUserData(null); // Очистить предыдущие результаты
       setTimeout(() => {
@@ -39,15 +39,33 @@ export default function Home() {
     }
   }, [loading, userData]);
 
-  const handleInputChange = (e: any) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let inputValue = e.target.value;
-    inputValue = "@" + inputValue.replace(/@+/g, "").trim();
+    if (!inputValue.startsWith("@")) {
+      inputValue = "@" + inputValue.replace(/@+/g, "").trim();
+    } else {
+      inputValue = "@" + inputValue.slice(1).replace(/@+/g, "").trim();
+    }
     setNickname(inputValue);
+
+    // Установить курсор в конец текста
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.setSelectionRange(
+          inputValue.length,
+          inputValue.length
+        );
+      }
+    }, 0);
   };
 
   const handleFocus = () => {
     if (!nickname.startsWith("@")) {
       setNickname("@");
+    }
+    // Установить курсор в конец текста
+    if (inputRef.current) {
+      inputRef.current.setSelectionRange(nickname.length, nickname.length);
     }
   };
 
@@ -68,6 +86,7 @@ export default function Home() {
             Быстрый поиск людей по никнейму — начните прямо сейчас!
           </p>
           <input
+            ref={inputRef}
             type="text"
             value={nickname}
             onFocus={handleFocus}
@@ -80,7 +99,7 @@ export default function Home() {
             type="button"
             className="search-button mt-3"
             onClick={handleSearchClick}
-            disabled={loading || !nickname.trim()}
+            disabled={loading || nickname.trim() === "@"}
           >
             {loading ? "Поиск..." : "Поиск!"}
           </button>
@@ -89,7 +108,7 @@ export default function Home() {
       {userData && (
         <div
           ref={resultsRef}
-          className="min-h-screen p-4 pb-20 pt-[40px] bg-gray-100 mt-8 rounded"
+          className="p-4 pb-10 pt-[40px] bg-gray-100 mt-8 rounded"
         >
           <h1
             className="font-semibold text-3xl mb-9 tracking-[-2px] max-w-full text-black text-center"
@@ -101,7 +120,7 @@ export default function Home() {
             Результаты для {userData.nickname}
           </h1>
           <div className="text-left text-black">
-          <ReactMarkdown>{userData.description}</ReactMarkdown>
+            <ReactMarkdown>{userData.description}</ReactMarkdown>
           </div>
         </div>
       )}
