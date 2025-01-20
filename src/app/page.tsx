@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { mockData } from "../../public/mockdata";
 import ReactMarkdown from "react-markdown";
+import { Mixpanel } from "@/components/Mixpanel";
 
 type UserData = {
   nickname: string;
@@ -25,6 +26,10 @@ export default function Home() {
         setUserData({
           nickname,
           description: mockData.description,
+        });
+        Mixpanel.track("Clicked on Search Button", {
+          Nickname: nickname,
+          Description: mockData.description,
         });
         setLoading(false);
       }, 2000); // Имитируем задержку получения данных
