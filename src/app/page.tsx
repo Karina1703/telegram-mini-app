@@ -122,26 +122,26 @@ export default function Home() {
             {loading ? "Поиск..." : "Поиск!"}
           </button>
         </div>
-      </main>
-      {userData && (
-        <div
-          ref={resultsRef}
-          className="p-4 pb-10 pt-[40px] bg-gray-100 mt-8 rounded"
-        >
-          <h1
-            className="font-semibold text-3xl mb-9 tracking-[-2px] max-w-full text-black text-center"
-            style={{
-              whiteSpace: "initial",
-              wordWrap: "break-word",
-            }}
+        {userData && (
+          <div
+            ref={resultsRef}
+            className="p-4 pb-10 pt-[40px] bg-gray-100 mt-8 rounded"
           >
-            Результаты для {userData.nickname}
-          </h1>
-          <div className="text-left text-black">
-            <ReactMarkdown>{userData.description}</ReactMarkdown>
+            <h1
+              className="font-semibold text-3xl mb-9 tracking-[-2px] max-w-full text-black text-center"
+              style={{
+                whiteSpace: "initial",
+                wordWrap: "break-word",
+              }}
+            >
+              Результаты для {userData.nickname}
+            </h1>
+            <div className="text-left text-black">
+              <ReactMarkdown>{userData.description}</ReactMarkdown>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </main>
     </div>
   );
 }

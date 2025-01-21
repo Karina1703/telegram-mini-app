@@ -1,7 +1,6 @@
 import mixpanel from "mixpanel-browser";
 
-// let env_check = process.env.NODE_ENV === 'production';
-const env_check = true;
+let env_check = process.env.NEXT_PUBLIC_ENV === "prod";
 
 export const Mixpanel = {
   identify: (id: string) => {

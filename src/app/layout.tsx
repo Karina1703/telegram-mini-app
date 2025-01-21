@@ -2,9 +2,9 @@
 
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import mixpanel from "mixpanel-browser";
-import { retrieveLaunchParams } from "@telegram-apps/sdk";
+import { retrieveLaunchParams, isTMA } from "@telegram-apps/sdk";
 import { Mixpanel } from "@/components/Mixpanel";
 
 const inter = Inter({
@@ -14,17 +14,12 @@ const inter = Inter({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+function MixapanelSetTelegramUser() {
   const { initData } = retrieveLaunchParams();
 
   useEffect(() => {
-    if (initData?.user && process.env.NEXT_PUBLIC_MIXPANEL_TOKEN) {
+    if (initData?.user) {
       const user = initData.user;
-      mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN);
       Mixpanel.identify(String(user?.id ?? 0));
       Mixpanel.track("Page loaded", {});
       Mixpanel.people.set({
@@ -36,6 +31,36 @@ export default function RootLayout({
     }
   }, []);
 
+  return null;
+}
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  const [isTelegram, setIsTelegram] = useState(false);
+
+  const initMixpanel = () => {
+    if (process.env.NEXT_PUBLIC_MIXPANEL_TOKEN) {
+      mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN);
+    }
+  };
+
+  const checkTelegram = async () => {
+    const result = await isTMA();
+    setIsTelegram(result);
+
+    if (!result) {
+      Mixpanel.track("Run outside Telegramm App", {});
+    }
+  };
+
+  useEffect(() => {
+    initMixpanel();
+    checkTelegram();
+  }, []);
+
   return (
     <html lang="en">
       <head>
@@ -44,7 +69,11 @@ export default function RootLayout({
           content="width=device-width, initial-scale=1, maximum-scale=1"
         />
       </head>
-      <body className={`${inter.variable} antialiased`}>{children}</body>
+      <body className={`${inter.variable} antialiased`}>
+        {isTelegram && <MixapanelSetTelegramUser />}
+
+        {children}
+      </body>
     </html>
   );
 }
