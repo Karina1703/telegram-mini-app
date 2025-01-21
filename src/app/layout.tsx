@@ -71,8 +71,6 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} antialiased`}>
         {isTelegram && <MixapanelSetTelegramUser />}
-        {"NEXT_PUBLIC_MIXPANEL_TOKEN" + process.env.NEXT_PUBLIC_MIXPANEL_TOKEN}
-        {"isTelegram" + isTelegram}
         {children}
       </body>
     </html>
