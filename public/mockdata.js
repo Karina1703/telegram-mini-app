@@ -1,17 +1,23 @@
 export const mockData = {
-  nickname: "@kate_tg",
-  description: `
-**Екатерина Иванова** — 28-летний фронтенд-разработчик из **Москвы, Россия**.  
-Увлекается **путешествиями**, **искусством** и **технологиями**.  
-В свободное время Катя занимается фотографией, изучает новые технологии и делится своими работами в [Instagram](https://instagram.com/kate.photo).  
-
-Последний раз она была в сети **6 января 2025 года в 12:30**.  
-Вы можете найти её в [Telegram](https://t.me/kate_tg).  
-
-Среди её интересов:  
-- Технологии  
-- Искусство  
-- Путешествия  
-- Фотография  
-`,
+  status: "ok",
+  result: {
+    phone_number: "+7 999 123-45-67",
+    is_scam: false,
+    is_fake: false,
+    is_support: true,
+    first_name: "Екатерина",
+    last_name: "Иванова",
+    last_online_date: "2025-01-06T12:30:00Z",
+    activities: [
+      {
+        group_title: "Frontend Developers",
+        last_update_time: "2024-12-31T15:00:00Z",
+      },
+      {
+        group_title: "React Enthusiasts",
+        last_update_time: "2024-11-15T10:00:00Z",
+      },
+    ],
+  },
 };
+ 

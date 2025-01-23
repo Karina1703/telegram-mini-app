@@ -4,10 +4,26 @@ import { useEffect, useRef, useState } from "react";
 import { mockData } from "../../public/mockdata";
 import ReactMarkdown from "react-markdown";
 import { Mixpanel } from "@/components/Mixpanel";
+import Image from "next/image";
 
 type UserData = {
-  nickname: string;
-  description: string;
+  status: string; // ok / error
+  result?: {
+    phone_number: string | null;
+    is_scam: boolean | null;
+    is_fake: boolean | null;
+    is_support: boolean | null;
+    first_name: string | null;
+    last_name: string | null;
+    last_online_date: string | null;
+    activities:
+      | {
+          group_title: string;
+          last_update_time: string;
+        }[]
+      | null;
+  };
+  message?: string;
 };
 
 export default function Home() {
@@ -23,13 +39,9 @@ export default function Home() {
       setUserData(null); // Очистить предыдущие результаты
       setTimeout(() => {
         // Симуляция получения данных
-        setUserData({
-          nickname,
-          description: mockData.description,
-        });
+        setUserData(mockData);
         Mixpanel.track("Clicked on Search Button", {
           Nickname: nickname,
-          Description: mockData.description,
         });
         setLoading(false);
       }, 2000); // Имитируем задержку получения данных
@@ -122,22 +134,121 @@ export default function Home() {
             {loading ? "Поиск..." : "Поиск!"}
           </button>
         </div>
-        {userData && (
+        {userData?.result && (
           <div
+            className="px-2 py-5 bg-white rounded-3xl shadow-lg mt-8 text-black"
             ref={resultsRef}
-            className="p-4 pb-10 pt-[40px] bg-gray-100 mt-8 rounded"
           >
-            <h1
-              className="font-semibold text-3xl mb-9 tracking-[-2px] max-w-full text-black text-center"
-              style={{
-                whiteSpace: "initial",
-                wordWrap: "break-word",
-              }}
-            >
-              Результаты для {userData.nickname}
-            </h1>
-            <div className="text-left text-black">
-              <ReactMarkdown>{userData.description}</ReactMarkdown>
+            <div className="p-4 py-7 flex justify-center items-center gap-6 rounded-3xl shadow-lg shadow-blue-500/50 text-left">
+              <div className="flex flex-col justify-center items-center">
+                <Image
+                  src="/avatar.svg"
+                  alt="Profile Picture"
+                  className="rounded-full object-cover mb-2"
+                  width={100}
+                  height={100}
+                />
+                <h1 className="text-1xl font-semibold">
+                  {userData.result?.first_name ?? "Без имени"}
+                </h1>
+                <h1 className="text-1xl font-semibold">
+                  {userData.result?.last_name ?? "Без фамилии"}
+                </h1>
+              </div>
+              <div className="flex flex-col gap-4 user-info">
+                <div className="info-item">
+                  <p
+                    className="font-semibold text-base mb-1
+"
+                  >
+                    {userData.result?.phone_number ?? "???"}
+                  </p>
+                  <p className="font-medium text-xs">Телефон</p>
+                </div>
+
+                <div className="info-item">
+                  <p
+                    className="font-semibold text-base mb-1
+"
+                  >
+                    {userData.result.last_online_date
+                      ? new Date(
+                          userData.result.last_online_date
+                        ).toLocaleString()
+                      : "???"}
+                  </p>
+                  <p className="font-medium text-xs">Последний онлайн</p>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col gap-3 mt-5">
+              <div className="flex items-center gap-2">
+                <Image
+                  src="/scam.svg"
+                  alt="scam"
+                  className="object-cover"
+                  width={30}
+                  height={30}
+                />
+                <div>
+                  Является ли скамом: {userData.result?.is_scam ? "да" : "нет"}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Image
+                  src="/anonymous.svg"
+                  alt="anonymous"
+                  className="object-cover"
+                  width={30}
+                  height={30}
+                />
+                <div>
+                  Является ли фейком: {userData.result?.is_fake ? "да" : "нет"}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Image
+                  src="/support.svg"
+                  alt="support"
+                  className="object-cover"
+                  width={30}
+                  height={30}
+                />
+                <div>
+                  Является ли поддержкой:{" "}
+                  {userData.result?.is_support ? "да" : "нет"}
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2">
+                  <Image
+                    src="/groups.svg"
+                    alt="groups"
+                    className="object-cover"
+                    width={30}
+                    height={30}
+                  />
+                  <div>Группы:</div>
+                </div>
+                {userData.result?.activities &&
+                userData.result.activities.length > 0 ? (
+                  <ul className="mt-3 text-left pl-4 flex flex-col gap-3">
+                    {userData.result.activities.map((activity, index) => (
+                      <li key={index} className="text-sm">
+                        - {activity.group_title} (Обновлено:{" "}
+                        {new Date(activity.last_update_time).toLocaleString()})
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-gray-500">
+                    Нет данных об активностях
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         )}
