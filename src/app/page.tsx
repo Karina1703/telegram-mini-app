@@ -32,19 +32,40 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const resultsRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
-
-  const handleSearchClick = () => {
+  
+  const handleSearchClick = async () => {
     if (nickname.trim() && nickname.length > 1) {
       setLoading(true);
       setUserData(null); // Очистить предыдущие результаты
-      setTimeout(() => {
-        // Симуляция получения данных
-        setUserData(mockData);
+
+      try {
+        const response = await fetch(
+          "http://62.113.110.66/public_api/find_user/",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ username: nickname }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status} - ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        setUserData(data);
+
         Mixpanel.track("Clicked on Search Button", {
           Nickname: nickname,
         });
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        // setUserData({ error: "Failed to fetch user data. Please try again." });
+      } finally {
         setLoading(false);
-      }, 2000); // Имитируем задержку получения данных
+      }
     }
   };
 
