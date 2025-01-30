@@ -36,7 +36,7 @@ export default function UserCard({ user }: UserCardProps) {
           <div className="info-item">
             <p className="font-semibold text-base mb-1">
               {user.last_online_date
-                ? new Date(user.last_online_date).toLocaleString()
+                ? new Date(user.last_online_date).toLocaleDateString("ru-RU")
                 : "Отсутствует"}
             </p>
             <p className="font-medium text-xs">Последний онлайн</p>
@@ -66,7 +66,10 @@ export default function UserCard({ user }: UserCardProps) {
               {user.activities.map((activity, index) => (
                 <li key={index} className="text-sm">
                   - {activity.group_title} (Обновлено:{" "}
-                  {new Date(activity.last_update_time).toLocaleString()})
+                  {new Date(activity.last_update_time).toLocaleDateString(
+                    "ru-RU"
+                  )}
+                  )
                 </li>
               ))}
             </ul>

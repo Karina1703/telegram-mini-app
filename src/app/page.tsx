@@ -119,14 +119,14 @@ export default function Home() {
           </div>
         )}
 
-        <div ref={resultsRef} className="w-full max-w-[600px] text-wrap">
+        <div ref={resultsRef} className="w-full max-w-[600px] text-wrap flex flex-col justify-center items-center">
           {data?.result && data.result.length > 0
             ? data.result.map((user, index) => (
                 <UserCard key={index} user={user} />
               ))
             : data !== undefined &&
               !isPending && (
-                <p className="font-normal text-base mt-[50px] text-wrap max-w-[400px]">
+                <p className="font-normal text-base mt-[50px] text-wrap max-w-[400px] text-center">
                   Ничего не найдено. Попробуйте поискать по другому имени.
                 </p>
               )}
