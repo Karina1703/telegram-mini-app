@@ -99,3 +99,15 @@ body {
   border-bottom: 1px solid #e5e7eb; 
   padding-bottom: 0.75rem;
 }
+
+.container {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.text-wrap {
+  word-break: break-word; 
+  overflow-wrap: break-word; 
+  white-space: normal; 
+}
+

@@ -9,9 +9,9 @@ type UserCardProps = {
 
 export default function UserCard({ user }: UserCardProps) {
   return (
-    <div className="px-2 py-5 bg-white rounded-3xl shadow-lg mt-8 text-black">
-      <div className="p-4 py-7 flex justify-center items-center gap-6 rounded-3xl shadow-lg shadow-blue-500/50 text-left">
-        <div className="flex flex-col justify-center items-center text-center">
+    <div className="px-4 py-5 bg-white rounded-3xl shadow-lg mt-8 text-black w-full max-w-[500px] text-wrap">
+      <div className="p-4 py-7 flex justify-center items-center gap-6 rounded-3xl shadow-lg shadow-blue-500/50 text-left w-full">
+        <div className="flex flex-col justify-center items-center text-wrap text-center">
           <Image
             src="/avatar.svg"
             alt="Profile Picture"
