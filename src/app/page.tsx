@@ -18,7 +18,10 @@ export default function Home() {
   const handleSearchClick = () => {
     if (nickname.trim().length > 1) {
       mutate(nickname);
-      Mixpanel.track("Clicked on Search Button", { Nickname: nickname });
+      Mixpanel.track("Clicked on Search Button", {
+        Nickname: nickname,
+        Data: data?.result ?? [],
+      });
     }
   };
 
@@ -79,56 +82,56 @@ export default function Home() {
   };
 
   return (
-<div className="min-h-screen p-4 pb-20 pt-[80px] container">
-  <main className="flex flex-col items-center text-center">
-    <div className="max-w-[500px] w-full text-wrap">
-      <p className="font-semibold text-5xl mb-4 tracking-[-3px]">
-        Око телеграмма
-      </p>
-      <p className="font-normal text-base mb-[50px] text-wrap">
-        Быстрый поиск людей по никнейму — начните прямо сейчас!
-      </p>
-      <input
-        ref={inputRef}
-        type="text"
-        value={nickname}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        onChange={handleInputChange}
-        onClick={handleClick}
-        className="search-input w-full max-w-[400px] text-wrap"
-        placeholder={"Введите ник, например, @kate_tg"}
-      />
-      <button
-        type="button"
-        className="search-button mt-3 w-full max-w-[200px]"
-        onClick={handleSearchClick}
-        disabled={isPending || nickname.trim() === "@"}
-      >
-        {isPending ? "Поиск..." : "Поиск!"}
-      </button>
-    </div>
-
-    {isError && (
-      <div className="text-red-500 mt-4 text-wrap max-w-[400px]">
-        Ошибка при загрузке: {error instanceof Error ? error.message : "Неизвестная ошибка"}
-      </div>
-    )}
-
-    <div ref={resultsRef} className="w-full max-w-[600px] text-wrap">
-
-      {data?.result && data.result.length > 0 ? (
-        data.result.map((user, index) => <UserCard key={index} user={user} />)
-      ) : (
-        !isPending && (
-          <p className="font-normal text-base mt-[50px] text-wrap max-w-[400px]">
-            Ничего не найдено. Попробуйте поискать по другому имени.
+    <div className="min-h-screen p-4 pb-20 pt-[80px] container">
+      <main className="flex flex-col items-center text-center">
+        <div className="max-w-[500px] w-full text-wrap">
+          <p className="font-semibold text-5xl mb-4 tracking-[-3px]">
+            Око телеграмма
           </p>
-        )
-      )}
-    </div>
-  </main>
-</div>
+          <p className="font-normal text-base mb-[50px] text-wrap">
+            Быстрый поиск людей по никнейму — начните прямо сейчас!
+          </p>
+          <input
+            ref={inputRef}
+            type="text"
+            value={nickname}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            onChange={handleInputChange}
+            onClick={handleClick}
+            className="search-input w-full max-w-[400px] text-wrap"
+            placeholder={"Введите ник, например, @kate_tg"}
+          />
+          <button
+            type="button"
+            className="search-button mt-3 w-full max-w-[200px]"
+            onClick={handleSearchClick}
+            disabled={isPending || nickname.trim() === "@"}
+          >
+            {isPending ? "Поиск..." : "Поиск!"}
+          </button>
+        </div>
 
+        {isError && (
+          <div className="text-red-500 mt-4 text-wrap max-w-[400px]">
+            Ошибка при загрузке:{" "}
+            {error instanceof Error ? error.message : "Неизвестная ошибка"}
+          </div>
+        )}
+
+        <div ref={resultsRef} className="w-full max-w-[600px] text-wrap">
+          {data?.result && data.result.length > 0
+            ? data.result.map((user, index) => (
+                <UserCard key={index} user={user} />
+              ))
+            : data !== undefined &&
+              !isPending && (
+                <p className="font-normal text-base mt-[50px] text-wrap max-w-[400px]">
+                  Ничего не найдено. Попробуйте поискать по другому имени.
+                </p>
+              )}
+        </div>
+      </main>
+    </div>
   );
 }
