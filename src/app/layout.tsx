@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import mixpanel from "mixpanel-browser";
 import { retrieveLaunchParams, isTMA } from "@telegram-apps/sdk";
 import { Mixpanel } from "@/components/Mixpanel";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -40,6 +41,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const [isTelegram, setIsTelegram] = useState(false);
+  const [queryClient] = useState(() => new QueryClient());
 
   const initMixpanel = () => {
     if (process.env.NEXT_PUBLIC_MIXPANEL_TOKEN) {
@@ -70,8 +72,10 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.variable} antialiased`}>
-        {isTelegram && <MixapanelSetTelegramUser />}
-        {children}
+        <QueryClientProvider client={queryClient}>
+          {isTelegram && <MixapanelSetTelegramUser />}
+          {children}
+        </QueryClientProvider>
       </body>
     </html>
   );

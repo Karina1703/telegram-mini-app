@@ -1,81 +1,34 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { mockData } from "../../public/mockdata";
-import ReactMarkdown from "react-markdown";
+import { useState, useRef, useEffect } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { Mixpanel } from "@/components/Mixpanel";
-import Image from "next/image";
-
-type UserData = {
-  status: string; // ok / error
-  result?: {
-    phone_number: string | null;
-    is_scam: boolean | null;
-    is_fake: boolean | null;
-    is_support: boolean | null;
-    first_name: string | null;
-    last_name: string | null;
-    last_online_date: string | null;
-    activities:
-      | {
-          group_title: string;
-          last_update_time: string;
-        }[]
-      | null;
-  };
-  message?: string;
-};
+import UserCard from "@/components/UserCard";
+import { fetchUserData } from "@/services/api";
 
 export default function Home() {
   const [nickname, setNickname] = useState("");
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState(false);
-  const resultsRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
-  
-  const handleSearchClick = async () => {
-    if (nickname.trim() && nickname.length > 1) {
-      setLoading(true);
-      setUserData(null); // Очистить предыдущие результаты
+  const resultsRef = useRef<HTMLDivElement | null>(null);
 
-      try {
-        const response = await fetch(
-          "http://62.113.110.66/public_api/find_user/",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ username: nickname }),
-          }
-        );
+  const { mutate, data, isPending, isError, error } = useMutation({
+    mutationFn: fetchUserData,
+  });
 
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status} - ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        setUserData(data);
-
-        Mixpanel.track("Clicked on Search Button", {
-          Nickname: nickname,
-        });
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-        // setUserData({ error: "Failed to fetch user data. Please try again." });
-      } finally {
-        setLoading(false);
-      }
+  const handleSearchClick = () => {
+    if (nickname.trim().length > 1) {
+      mutate(nickname);
+      Mixpanel.track("Clicked on Search Button", { Nickname: nickname });
     }
   };
 
   useEffect(() => {
-    if (!loading && userData && resultsRef.current) {
+    if (!isPending && data && resultsRef.current) {
       const topOffset =
         resultsRef.current.getBoundingClientRect().top + window.scrollY - 20;
       window.scrollTo({ top: topOffset, behavior: "smooth" });
     }
-  }, [loading, userData]);
+  }, [isPending, data]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let inputValue = e.target.value;
@@ -129,7 +82,7 @@ export default function Home() {
     <div className="min-h-screen p-4 pb-20 pt-[80px]">
       <main className="flex flex-col row-start-2 items-center text-center">
         <div className="max-w-[500px]">
-          <p className="font-semibold	text-5xl mb-4 tracking-[-3px]">
+          <p className="font-semibold text-5xl mb-4 tracking-[-3px]">
             Око телеграмма
           </p>
           <p className="font-normal text-base mb-[50px]">
@@ -150,129 +103,31 @@ export default function Home() {
             type="button"
             className="search-button mt-3"
             onClick={handleSearchClick}
-            disabled={loading || nickname.trim() === "@"}
+            disabled={isPending || nickname.trim() === "@"}
           >
-            {loading ? "Поиск..." : "Поиск!"}
+            {isPending ? "Поиск..." : "Поиск!"}
           </button>
         </div>
-        {userData?.result && (
-          <div
-            className="px-2 py-5 bg-white rounded-3xl shadow-lg mt-8 text-black"
-            ref={resultsRef}
-          >
-            <div className="p-4 py-7 flex justify-center items-center gap-6 rounded-3xl shadow-lg shadow-blue-500/50 text-left">
-              <div className="flex flex-col justify-center items-center">
-                <Image
-                  src="/avatar.svg"
-                  alt="Profile Picture"
-                  className="rounded-full object-cover mb-2"
-                  width={100}
-                  height={100}
-                />
-                <h1 className="text-1xl font-semibold">
-                  {userData.result?.first_name ?? "Без имени"}
-                </h1>
-                <h1 className="text-1xl font-semibold">
-                  {userData.result?.last_name ?? "Без фамилии"}
-                </h1>
-              </div>
-              <div className="flex flex-col gap-4 user-info">
-                <div className="info-item">
-                  <p
-                    className="font-semibold text-base mb-1
-"
-                  >
-                    {userData.result?.phone_number ?? "???"}
-                  </p>
-                  <p className="font-medium text-xs">Телефон</p>
-                </div>
 
-                <div className="info-item">
-                  <p
-                    className="font-semibold text-base mb-1
-"
-                  >
-                    {userData.result.last_online_date
-                      ? new Date(
-                          userData.result.last_online_date
-                        ).toLocaleString()
-                      : "???"}
-                  </p>
-                  <p className="font-medium text-xs">Последний онлайн</p>
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-col gap-3 mt-5">
-              <div className="flex items-center gap-2">
-                <Image
-                  src="/scam.svg"
-                  alt="scam"
-                  className="object-cover"
-                  width={30}
-                  height={30}
-                />
-                <div>
-                  Является ли скамом: {userData.result?.is_scam ? "да" : "нет"}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Image
-                  src="/anonymous.svg"
-                  alt="anonymous"
-                  className="object-cover"
-                  width={30}
-                  height={30}
-                />
-                <div>
-                  Является ли фейком: {userData.result?.is_fake ? "да" : "нет"}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Image
-                  src="/support.svg"
-                  alt="support"
-                  className="object-cover"
-                  width={30}
-                  height={30}
-                />
-                <div>
-                  Является ли поддержкой:{" "}
-                  {userData.result?.is_support ? "да" : "нет"}
-                </div>
-              </div>
-
-              <div>
-                <div className="flex items-center gap-2">
-                  <Image
-                    src="/groups.svg"
-                    alt="groups"
-                    className="object-cover"
-                    width={30}
-                    height={30}
-                  />
-                  <div>Группы:</div>
-                </div>
-                {userData.result?.activities &&
-                userData.result.activities.length > 0 ? (
-                  <ul className="mt-3 text-left pl-4 flex flex-col gap-3">
-                    {userData.result.activities.map((activity, index) => (
-                      <li key={index} className="text-sm">
-                        - {activity.group_title} (Обновлено:{" "}
-                        {new Date(activity.last_update_time).toLocaleString()})
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-sm text-gray-500">
-                    Нет данных об активностях
-                  </p>
-                )}
-              </div>
-            </div>
+        {isError && (
+          <div className="text-red-500 mt-4">
+            Ошибка при загрузке:{" "}
+            {error instanceof Error ? error.message : "Неизвестная ошибка"}
           </div>
         )}
+
+        <div ref={resultsRef}>
+          {data?.result && data.result.length > 0
+            ? data.result.map((user, index) => (
+                <UserCard key={index} user={user} />
+              ))
+            : 
+              !isPending && (
+                <p className="font-normal text-base mt-[50px]">
+                  Ничего не найдено. Попробуйте поискать по другому имени.
+                </p>
+              )}
+        </div>
       </main>
     </div>
   );
