@@ -1,3 +1,5 @@
+"use server";
+
 export type User = {
   phone_number: string | null;
   is_scam: boolean | null;
@@ -30,6 +32,7 @@ export const fetchUserData = async (username: string): Promise<UserData> => {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username }),
+    cache: "no-store",
   });
 
   if (!response.ok) {
