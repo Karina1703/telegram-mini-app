@@ -3,8 +3,6 @@
 export type User = {
   phone_number: string | null;
   is_scam: boolean | null;
-  is_fake: boolean | null;
-  is_support: boolean | null;
   first_name: string | null;
   last_name: string | null;
   last_online_date: string | null;

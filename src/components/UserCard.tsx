@@ -48,14 +48,6 @@ export default function UserCard({ user }: UserCardProps) {
           <Image src="/scam.svg" alt="scam" width={30} height={30} />
           <div>Является ли скамом: {user.is_scam ? "да" : "нет"}</div>
         </div>
-        <div className="flex items-center gap-2">
-          <Image src="/anonymous.svg" alt="anonymous" width={30} height={30} />
-          <div>Является ли фейком: {user.is_fake ? "да" : "нет"}</div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Image src="/support.svg" alt="support" width={30} height={30} />
-          <div>Является ли поддержкой: {user.is_support ? "да" : "нет"}</div>
-        </div>
         <div>
           <div className="flex items-center gap-2">
             <Image src="/groups.svg" alt="groups" width={30} height={30} />

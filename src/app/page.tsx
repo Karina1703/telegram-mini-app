@@ -35,50 +35,7 @@ export default function Home() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let inputValue = e.target.value;
-    if (!inputValue.startsWith("@")) {
-      inputValue = "@" + inputValue.replace(/@+/g, "").trim();
-    } else {
-      inputValue = "@" + inputValue.slice(1).replace(/@+/g, "").trim();
-    }
     setNickname(inputValue);
-
-    // Установить курсор в конец текста
-    setTimeout(() => {
-      if (inputRef.current) {
-        inputRef.current.setSelectionRange(
-          inputValue.length,
-          inputValue.length
-        );
-      }
-    }, 0);
-  };
-
-  const handleFocus = () => {
-    if (!nickname.startsWith("@")) {
-      setNickname("@");
-    }
-    // Установить курсор в конец текста
-    if (inputRef.current) {
-      inputRef.current.setSelectionRange(nickname.length, nickname.length);
-    }
-  };
-
-  const handleBlur = () => {
-    if (nickname === "@") {
-      setNickname("");
-    }
-  };
-
-  const handleClick = (e: React.MouseEvent<HTMLInputElement>) => {
-    if (inputRef.current) {
-      const cursorPosition = inputRef.current.selectionStart || 0;
-      if (cursorPosition <= 1) {
-        // Перемещаем курсор за @
-        setTimeout(() => {
-          inputRef.current?.setSelectionRange(1, 1);
-        }, 0);
-      }
-    }
   };
 
   return (
@@ -95,13 +52,11 @@ export default function Home() {
             ref={inputRef}
             type="text"
             value={nickname}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
             onChange={handleInputChange}
-            onClick={handleClick}
             className="search-input w-full max-w-[400px] text-wrap"
-            placeholder={"Введите ник, например, @kate_tg"}
+            placeholder={"Ведите ник, имя, фамилию или телефон"}
           />
+          
           <button
             type="button"
             className="search-button mt-3 w-full max-w-[200px]"
@@ -119,7 +74,10 @@ export default function Home() {
           </div>
         )}
 
-        <div ref={resultsRef} className="w-full max-w-[600px] text-wrap flex flex-col justify-center items-center">
+        <div
+          ref={resultsRef}
+          className="w-full max-w-[600px] text-wrap flex flex-col justify-center items-center"
+        >
           {data?.result && data.result.length > 0
             ? data.result.map((user, index) => (
                 <UserCard key={index} user={user} />
